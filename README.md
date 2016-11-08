@@ -1,9 +1,9 @@
 [linuxserverurl]: https://linuxserver.io
 [forumurl]: https://forum.linuxserver.io
-[ircurl]: https://www.linuxserver.io/index.php/irc/
-[podcasturl]: https://www.linuxserver.io/index.php/category/podcast/
+[ircurl]: https://www.linuxserver.io/irc/
+[podcasturl]: https://www.linuxserver.io/podcast/
 
-[![linuxserver.io](https://www.linuxserver.io/wp-content/uploads/2015/06/linuxserver_medium.png)][linuxserverurl]
+[![linuxserver.io](https://raw.githubusercontent.com/linuxserver/docker-templates/master/linuxserver.io/img/linuxserver_medium.png)][linuxserverurl]
 
 The [LinuxServer.io][linuxserverurl] team brings you another container release featuring easy user mapping and community support. Find us for support at:
 * [forum.linuxserver.io][forumurl]
@@ -12,7 +12,7 @@ The [LinuxServer.io][linuxserverurl] team brings you another container release f
 
 # linuxserver/plex
 
-[![](https://images.microbadger.com/badges/image/linuxserver/plex.svg)](http://microbadger.com/images/linuxserver/plex "Get your own image badge on microbadger.com")[![Docker Pulls](https://img.shields.io/docker/pulls/linuxserver/plex.svg)][hub][![Docker Stars](https://img.shields.io/docker/stars/linuxserver/plex.svg)][hub][![Build Status](http://jenkins.linuxserver.io:8080/buildStatus/icon?job=Dockers/LinuxServer.io/linuxserver-plex)](http://jenkins.linuxserver.io:8080/job/Dockers/job/LinuxServer.io/job/linuxserver-plex/)
+[![](https://images.microbadger.com/badges/image/linuxserver/plex.svg)](http://microbadger.com/images/linuxserver/plex "Get your own image badge on microbadger.com")[![Docker Pulls](https://img.shields.io/docker/pulls/linuxserver/plex.svg)][hub][![Docker Stars](https://img.shields.io/docker/stars/linuxserver/plex.svg)][hub][![Build Status](http://jenkins.linuxserver.io:8080/buildStatus/icon?job=Dockers/LinuxServer.io-hub-built/linuxserver-plex)](http://jenkins.linuxserver.io:8080/job/Dockers/job/LinuxServer.io-hub-built/job/linuxserver-plex/)
 [hub]: https://hub.docker.com/r/linuxserver/plex/
 
 [Plex](https://plex.tv/) organizes video, music and photos from personal media libraries and streams them to smart TVs, streaming boxes and mobile devices. This container is packaged as a standalone Plex Media Server.
@@ -24,18 +24,25 @@ The [LinuxServer.io][linuxserverurl] team brings you another container release f
 
 ```
 docker create \
-	--name=plex \
-	--net=host \
-	-e VERSION=latest \
-	-e PUID=<UID> -e PGID=<GID> \
-	-v </path/to/library>:/config \
-	-v <path/to/tvseries>:/data/tvshows \
-	-v </path/to/movies>:/data/movies \
-	-v </path for transcoding>:/transcode \
-	linuxserver/plex
+--name=plex \
+--net=host \
+-e VERSION=latest \
+-e PUID=<UID> -e PGID=<GID> \
+-e TZ=<timezone> \
+-v </path/to/library>:/config \
+-v <path/to/tvseries>:/data/tvshows \
+-v </path/to/movies>:/data/movies \
+-v </path for transcoding>:/transcode \
+linuxserver/plex
 ```
 
-**Parameters**
+## Parameters
+
+`The parameters are split into two halves, separated by a colon, the left hand side representing the host and the right the container side. 
+For example with a port -p external:internal - what this shows is the port mapping from internal to external of the container.
+So -p 8080:80 would expose port 80 from inside the container to be accessible from the host's IP on port 8080
+http://192.168.x.x:8080 would show you what's running INSIDE the container on port 80.`
+
 
 * `--net=host` - Shares host networking with container, **required**.
 * `-v /config` - Plex library location. *This can grow very large, 50gb+ is likely for a large collection.*
@@ -44,10 +51,11 @@ docker create \
 * `-e VERSION=latest` - Set whether to update plex or not - see Setting up application section.
 * `-e PGID=` for for GroupID - see below for explanation
 * `-e PUID=` for for UserID - see below for explanation
+* `-e TZ` - for timezone information *eg Europe/London, etc*
 
 It is based on ubuntu xenial with s6 overlay, for shell access whilst the container is running do `docker exec -it plex /bin/bash`.
 
-*Special note* - If you'd like to run Plex without requiring `--net=host` (not recommended) then you will need the following ports in your `docker create` command:
+*Special note* - If you'd like to run Plex without requiring `--net=host` (`NOT recommended`) then you will need the following ports in your `docker create` command:
 
 ```
   -p 32400:32400 \
@@ -69,7 +77,7 @@ In this instance `PUID=1001` and `PGID=1001`. To find yours use `id user` as bel
     uid=1001(dockeruser) gid=1001(dockergroup) groups=1001(dockergroup)
 ```
 
-## Setting up the application 
+## Setting up the application
 Webui can be found at `<your-ip>:32400/web`
 
 ** Note about updates, if there is no value set for the VERSION variable, then no updates will take place.**
@@ -80,7 +88,7 @@ Valid settings for VERSION are:-
 
 `IMPORTANT NOTE:- YOU CANNOT UPDATE TO A PLEXPASS ONLY VERSION IF YOU DO NOT HAVE PLEXPASS`
 
-+ **`latest`**: will update plex to the latest version available that you are entitled to. 
++ **`latest`**: will update plex to the latest version available that you are entitled to.
 + **`public`**: will update plexpass users to the latest public version, useful for plexpass users that don't want to be on the bleeding edge but still want the latest public updates.
 + **`<specific-version>`**: will select a specific version (eg 0.9.12.4.1192-9a47d21) of plex to install, note you cannot use this to access plexpass versions if you do not have plexpass.
 
@@ -92,6 +100,8 @@ Valid settings for VERSION are:-
 
 ## Versions
 
++ **17.10.16:** Allow use of uppercase version variable
++ **01.10.16:** Add TZ info to README.
 + **09.09.16:** Add layer badges to README.
 + **27.08.16:** Add badges to README.
 + **22.08.16:** Rebased to xenial and s6 overlay
